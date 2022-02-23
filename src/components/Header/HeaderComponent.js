@@ -9,6 +9,6 @@ const HeaderComponent = ({ children, bg }) => {
 export default HeaderComponent;
 
 HeaderComponent.propTypes = {
-  children: PropTypes.elementType.isRequired,
+  children: PropTypes.element.isRequired,
   bg: PropTypes.string
 };
