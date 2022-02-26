@@ -7,6 +7,14 @@ const TitleText = styled(Title)`
   font-weight: bold;
   line-height: 1.1;
 `;
-const BodyText = styled(Text)``;
+const BodyText = styled(Text)`
+  ${({ sm }) =>
+    sm &&
+    `
+    font-size:0.7rem;
+    
+    `}
+  color: ${({ color }) => color};
+`;
 
 export { TitleText, BodyText };

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import { GlobalContext } from '../../../context/provider';
 import { SearchOutlined } from '@ant-design/icons/lib/icons';
-import { Form, Row, Col, Input, Radio, Slider } from 'antd';
+import { Form, Row, Col, Input, Radio, Slider, Button } from 'antd';
 import { colors } from '../../../constants/styleConstants';
+import debounceHandler from '../../../helpers/debounceHandler';
+import loadMovie from '../../../context/actions/loadMovie';
 
 const AntRow = styled(Row)`
   input {
@@ -72,25 +75,45 @@ const AntRow = styled(Row)`
 
 const SliderRangeLabel = styled(Col)`
   display: flex;
-  fontsize: 0.77rem;
-  alignitems: center;
+  font-size: 0.77rem;
+  align-items: center;
+  justify-content: center;
   color: ${() => colors.GREY_COLOR_2};
 `;
 const MovieSearchForm = () => {
-  const onFinish = (values) => {
+  const {
+    movieListContext: { movieListDispatch }
+  } = useContext(GlobalContext);
+
+  // const [formVal, setFormVal] = useState({});
+  const [form] = Form.useForm();
+
+  const onFinishFunc = (values) => {
+    loadMovie(values)(movieListDispatch);
     console.log('Received values of form: ', values);
   };
-
+  const submitForm = () => {
+    console.log('yes triggered submit');
+    form.submit();
+  };
+  // const onChangeForm = () => {
+  //   console.log('yes triggered onChangeForm');
+  //   form.onChange();
+  // };
   return (
     <Form
+      form={form}
       name="searchMovie_form"
       layout="vertical"
-      initialValues={
-        {
-          // remember: true
-        }
-      }
-      onFinish={onFinish}>
+      initialValues={{
+        // yearRange: [], // add initial value to min and max form data I get form the server
+        movieKeyword: '',
+        videoType: 'any'
+      }}
+      onFinish={onFinishFunc}
+      // submit={submitForm}
+      // onChange={onChangeForm}
+    >
       <AntRow color={colors.white}>
         <Col xs={{ span: 24 }} lg={{ span: 9 }}>
           <Form.Item style={{ marginBottom: 0 }} name="movieKeyword">
@@ -101,6 +124,8 @@ const MovieSearchForm = () => {
               placeholder="Search"
               prefix={
                 <SearchOutlined
+                  // htmltype="submit"
+                  onClick={submitForm}
                   style={{ fontSize: '1.2rem', paddingRight: '0.5rem', color: colors.white }}
                 />
               }
@@ -110,11 +135,20 @@ const MovieSearchForm = () => {
         <Col xs={{ span: 24 }} lg={{ span: 15 }}>
           <AntRow justify="end" color={colors.white}>
             <Col xs={{ span: 12 }} lg={{ span: 7 }}>
-              <Form.Item label="YEAR" style={{ marginBottom: 0 }} name="yearRange"></Form.Item>
               <AntRow>
                 <SliderRangeLabel span={3}>1970</SliderRangeLabel>
                 <Col span={18}>
-                  <Slider range min={1993} max={2022} defaultValue={[1999, 2009]} />
+                  <Form.Item label="YEAR" style={{ marginBottom: 0 }} name="yearRange">
+                    <Slider
+                      onChange={() => submitForm('delay')}
+                      // onKeyPress={(e) => radioValueChange(e)}
+                      disabled={true}
+                      range
+                      min={0}
+                      max={0}
+                      // defaultValue={[1999, 2009]}
+                    />
+                  </Form.Item>
                 </Col>
                 <SliderRangeLabel span={3}>2015</SliderRangeLabel>
               </AntRow>
@@ -122,13 +156,18 @@ const MovieSearchForm = () => {
             <Col xs={{ span: 12 }} lg={{ span: 12 }}>
               <AntRow justify="end">
                 <Form.Item label="TYPE" style={{ marginBottom: 0 }} name="videoType">
-                  <Radio.Group>
+                  <Radio.Group onChange={submitForm}>
                     <Radio value="any">Any</Radio>
-                    <Radio value="movies">Movies</Radio>
+                    <Radio value="movie">Movies</Radio>
                     <Radio value="series">Series</Radio>
-                    <Radio value="episodes">Episodes</Radio>
+                    <Radio value="episode">Episodes</Radio>
                   </Radio.Group>
                 </Form.Item>
+                {/* <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                </Form.Item> */}
               </AntRow>
             </Col>
           </AntRow>

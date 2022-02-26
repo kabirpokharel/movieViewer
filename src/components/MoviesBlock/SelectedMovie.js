@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import GlobalContext from '../../context/provider';
 import { Button, Col, Row, Tag } from 'antd';
 import { movieData } from '../../constants/dummyMovieSearchResult';
 import { LikeFilled, LikeOutlined } from '@ant-design/icons/lib/icons';
 import { colors } from '../../constants/styleConstants';
 import { BodyText, TitleText } from '../Fonts/font';
+import { ADD_TO_WATCHLIST, REMOVE_FROM_WATCHLIST } from '../../constants/actionConstants';
 
 const MoviesBlockBodyWrapper = styled.div`
   padding: 2rem 0 0 2rem;
@@ -37,19 +39,32 @@ const RatingContainer = styled.div`
   }
 `;
 
-const MovieDetails = ({ movieDetails }) => {
+const watchListToggler = (movieId, dispatch, watchlist) => {
+  const isInWatchlist = watchlist.find((movie) => movie.imdbID === movieId);
+  let action = ADD_TO_WATCHLIST;
+  if (isInWatchlist) {
+    action = REMOVE_FROM_WATCHLIST;
+  }
+  dispatch({ action, movieId });
+};
+
+const MovieDetails = ({ currentMovie, watchlist, movieListDispatch }) => {
   const [favourite, setfavourite] = useState(!false);
-  const { Poster, Title, Rated, Year, Genre, Runtime, Actors, Ratings } = movieDetails;
+  const { Poster, Title, Rated, Year, Genre, Runtime, Actors, Ratings, imdbID } = currentMovie;
   return (
-    <Row style={{ paddingBottom: '1rem', borderBottom: `0.5px solid ${colors.GREY_COLOR_2}` }}>
-      <Col>
+    <Row style={{ padding: '0 2rem 1rem 0', borderBottom: `0.5px solid ${colors.GREY_COLOR_2}` }}>
+      <Col style={{ marginRight: '1rem' }}>
         <img src={Poster} height="300px" width="auto" alt="movie poster" />
       </Col>
       <Col style={{ flex: 1 }}>
-        <Row style={{ marginRight: '2rem' }} justify="end">
-          <Button icon={favourite ? <LikeOutlined /> : <LikeFilled />}>Watchlist </Button>
+        <Row justify="end">
+          <Button
+            onClick={() => watchListToggler(imdbID, movieListDispatch, watchlist)}
+            icon={favourite ? <LikeOutlined /> : <LikeFilled />}>
+            Watchlist{' '}
+          </Button>
         </Row>
-        <Row align="bottom" style={{ height: 'calc(100% - 32px)', margin: '0 1rem' }}>
+        <Row align="bottom" style={{ height: 'calc(100% - 32px)' }}>
           <Col>
             <Row>
               <TitleText level={2}>{Title}</TitleText>
@@ -77,7 +92,7 @@ const MoviePlot = ({ plot }) => {
         padding: '0.5rem 2rem 0.5rem 0',
         borderBottom: `0.5px solid ${colors.GREY_COLOR_2}`
       }}>
-      <BodyText>{plot}</BodyText>
+      <BodyText style={{ textAlign: 'justify' }}>{plot}</BodyText>
     </Row>
   );
 };
@@ -87,8 +102,10 @@ const MovieRatings = ({ ratings }) => {
     <MovieRatingWrapper>
       {ratings.map((rating, id) => (
         <RatingContainer key={rating.Source + id}>
-          <div>{rating.Value}</div>
-          <div>{rating.Source}</div>
+          <BodyText style={{ textAlign: 'center' }}>{rating.Value}</BodyText>
+          <BodyText sm={true} color={colors.FONT_COLOR_2} style={{ textAlign: 'center' }}>
+            {rating.Source}
+          </BodyText>
         </RatingContainer>
       ))}
     </MovieRatingWrapper>
@@ -96,11 +113,21 @@ const MovieRatings = ({ ratings }) => {
 };
 
 const SelectedMovie = () => {
+  const [movieLoading, setMovieLoading] = useState(false);
+
+  const {
+    movieListContext: { movieListState, movieListDispatch }
+  } = useContext(GlobalContext);
+  const { currentMovie, watchlist } = movieListState;
+
+  if (movieLoading) {
+    <div>Movie Loading</div>;
+  }
   return (
     <MoviesBlockBodyWrapper>
-      <MovieDetails movieDetails={movieData} />
-      <MoviePlot plot={movieData.Plot} />
-      <MovieRatings ratings={movieData.Ratings} />
+      <MovieDetails {...{ currentMovie, watchlist, movieListDispatch }} />
+      <MoviePlot plot={currentMovie.Plot} />
+      <MovieRatings ratings={currentMovie.Ratings} />
     </MoviesBlockBodyWrapper>
   );
 };
