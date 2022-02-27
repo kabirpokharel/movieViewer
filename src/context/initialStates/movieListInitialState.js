@@ -3,7 +3,11 @@ const movieListInitialState = {
   currentMovie: {},
   loadingPage: false,
   loadingMovieDetails: false,
-  watchlist: []
+  watchlist: [],
+  searchParams: {}, //movieKeyword, videoType, yearRange
+  movieBuffer: [],
+
+  pageNumber: 1
 };
 
 export default movieListInitialState;

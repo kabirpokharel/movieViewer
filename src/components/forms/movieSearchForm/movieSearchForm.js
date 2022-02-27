@@ -85,7 +85,6 @@ const MovieSearchForm = () => {
     movieListContext: { movieListDispatch }
   } = useContext(GlobalContext);
 
-  // const [formVal, setFormVal] = useState({});
   const [form] = Form.useForm();
 
   const onFinishFunc = (values) => {
@@ -96,10 +95,6 @@ const MovieSearchForm = () => {
     console.log('yes triggered submit');
     form.submit();
   };
-  // const onChangeForm = () => {
-  //   console.log('yes triggered onChangeForm');
-  //   form.onChange();
-  // };
   return (
     <Form
       form={form}
@@ -163,11 +158,6 @@ const MovieSearchForm = () => {
                     <Radio value="episode">Episodes</Radio>
                   </Radio.Group>
                 </Form.Item>
-                {/* <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                  </Button>
-                </Form.Item> */}
               </AntRow>
             </Col>
           </AntRow>
