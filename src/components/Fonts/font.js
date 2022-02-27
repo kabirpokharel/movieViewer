@@ -9,7 +9,7 @@ const TitleText = styled(Title)`
 `;
 const BodyText = styled(Text)`
   ${({ sm }) =>
-    sm &&
+    sm === true &&
     `
     font-size:0.7rem;
     

@@ -13,7 +13,7 @@ const MoviesBlockBody = () => {
   } = useContext(GlobalContext);
 
   const { movieList, loadingPage } = movieListState;
-  console.log('see this is movieListState', movieList);
+  console.log('see this is movieListState', movieListState);
 
   if (isEmpty(movieList)) {
     return (
@@ -53,9 +53,9 @@ const MoviesBlockBody = () => {
       <Col xs={{ span: 24 }} lg={{ span: 9 }}>
         <MoviesList {...{ movieList }} />
       </Col>
-      {/* <Col xs={{ span: 24 }} lg={{ span: 15 }}>
+      <Col xs={{ span: 24 }} lg={{ span: 15 }}>
         <SelectedMovie />
-      </Col> */}
+      </Col>
     </Row>
   );
 };

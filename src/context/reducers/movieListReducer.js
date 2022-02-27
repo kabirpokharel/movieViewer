@@ -2,16 +2,19 @@
 //   movieList: {},
 // currentMovie: {},
 //   loadingPage: false,
+// loadingMovieDetails:false;
 //   watchlist: []
 // };
 
 import {
+  FETCH_MOVIE_LIST_LOADING,
+  FETCH_MOVIE_LIST_SUCCESS,
+  FETCH_MOVIE_LIST_FAIL,
   ADD_TO_WATCHLIST,
-  FETCH_MOVIE_FAIL,
-  FETCH_MOVIE_LOADING,
-  FETCH_MOVIE_SUCCESS,
   REMOVE_FROM_WATCHLIST,
-  SET_CURRENT_MOVIE
+  FETCH_MOVIE_DETAIL_LOADING,
+  FETCH_MOVIE_DETAIL_SUCCESS,
+  FETCH_MOVIE_DETAIL_FAIL
 } from '../../constants/actionConstants';
 
 const watchlistAction = (currentWatchlist, movieId, action) => {
@@ -25,14 +28,21 @@ const watchlistAction = (currentWatchlist, movieId, action) => {
 };
 const movieListReducer = (state, { type, payload }) => {
   switch (type) {
-    case FETCH_MOVIE_LOADING:
+    //movie list
+    case FETCH_MOVIE_LIST_LOADING:
       return { ...state, loadingPage: true };
-    case FETCH_MOVIE_SUCCESS:
-      return { ...state, loadingPage: false, movieList: payload };
-    case FETCH_MOVIE_FAIL:
+    case FETCH_MOVIE_LIST_SUCCESS:
+      return { ...state, loadingPage: false, currentMovie: {}, movieList: payload };
+    case FETCH_MOVIE_LIST_FAIL:
       return { ...state, loadingPage: false };
-    case SET_CURRENT_MOVIE:
-      return { ...state, currentMovie: payload };
+    //movie details
+    case FETCH_MOVIE_DETAIL_LOADING:
+      return { ...state, loadingMovieDetails: true };
+    case FETCH_MOVIE_DETAIL_SUCCESS:
+      return { ...state, loadingMovieDetails: false, currentMovie: payload };
+    case FETCH_MOVIE_DETAIL_FAIL:
+      return { ...state, loadingMovieDetails: false };
+    //movie watchlist
     case ADD_TO_WATCHLIST:
       return {
         ...state,

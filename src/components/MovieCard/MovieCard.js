@@ -9,7 +9,7 @@ const MovieCardContainer = styled.div`
   align-items: center;
   padding: 2rem;
   border-bottom: ${() => `1px solid ${colors.GREY_COLOR_2}`};
-  border-right: ${() => `1px solid ${colors.GREY_COLOR_2}`};
+  // border-right: ${() => `1px solid ${colors.GREY_COLOR_2}`};
 `;
 
 const MovieCard = ({ movie, movieCardClicked }) => {

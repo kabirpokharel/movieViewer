@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import GlobalContext from '../../context/provider';
+import { GlobalContext } from '../../context/provider';
 import { Button, Col, Row, Tag } from 'antd';
-import { movieData } from '../../constants/dummyMovieSearchResult';
+// import { movieData } from '../../constants/dummyMovieSearchResult';
 import { LikeFilled, LikeOutlined } from '@ant-design/icons/lib/icons';
 import { colors } from '../../constants/styleConstants';
 import { BodyText, TitleText } from '../Fonts/font';
 import { ADD_TO_WATCHLIST, REMOVE_FROM_WATCHLIST } from '../../constants/actionConstants';
+import isEmpty from '../../helpers/isEmpty';
 
 const MoviesBlockBodyWrapper = styled.div`
   padding: 2rem 0 0 2rem;
@@ -59,7 +60,7 @@ const MovieDetails = ({ currentMovie, watchlist, movieListDispatch }) => {
       <Col style={{ flex: 1 }}>
         <Row justify="end">
           <Button
-            onClick={() => watchListToggler(imdbID, movieListDispatch, watchlist)}
+            // onClick={() => watchListToggler(imdbID, movieListDispatch, watchlist)}
             icon={favourite ? <LikeOutlined /> : <LikeFilled />}>
             Watchlist{' '}
           </Button>
@@ -113,15 +114,21 @@ const MovieRatings = ({ ratings }) => {
 };
 
 const SelectedMovie = () => {
-  const [movieLoading, setMovieLoading] = useState(false);
-
   const {
     movieListContext: { movieListState, movieListDispatch }
   } = useContext(GlobalContext);
-  const { currentMovie, watchlist } = movieListState;
 
-  if (movieLoading) {
-    <div>Movie Loading</div>;
+  const { currentMovie, watchlist, loadingMovieDetails } = movieListState;
+
+  if (loadingMovieDetails) {
+    return <div>Movie Loading</div>;
+  }
+  if (isEmpty(currentMovie)) {
+    return (
+      <div>
+        <h1>No movie selected</h1>
+      </div>
+    );
   }
   return (
     <MoviesBlockBodyWrapper>

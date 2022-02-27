@@ -5,7 +5,7 @@ import { SearchOutlined } from '@ant-design/icons/lib/icons';
 import { Form, Row, Col, Input, Radio, Slider, Button } from 'antd';
 import { colors } from '../../../constants/styleConstants';
 import debounceHandler from '../../../helpers/debounceHandler';
-import loadMovie from '../../../context/actions/loadMovie';
+import loadMovieList from '../../../context/actions/loadMovieList';
 
 const AntRow = styled(Row)`
   input {
@@ -89,7 +89,7 @@ const MovieSearchForm = () => {
   const [form] = Form.useForm();
 
   const onFinishFunc = (values) => {
-    loadMovie(values)(movieListDispatch);
+    loadMovieList(values)(movieListDispatch);
     console.log('Received values of form: ', values);
   };
   const submitForm = () => {
