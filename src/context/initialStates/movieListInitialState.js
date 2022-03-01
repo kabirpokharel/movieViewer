@@ -4,10 +4,9 @@ const movieListInitialState = {
   loadingPage: false,
   loadingMovieDetails: false,
   watchlist: [],
-  searchParams: {}, //movieKeyword, videoType, yearRange
-  movieBuffer: [],
-
-  pageNumber: 1
+  searchParams: {}, //movieKeyword, videoType, yearRange, pageNumber
+  movieBuffer: []
+  // pageNumber: 1
 };
 
 export default movieListInitialState;

@@ -1,20 +1,25 @@
 // const movieListStateDummy = {
-//   movieList: {},
-// currentMovie: {},
+// movieList: {},
+//   currentMovie: {},
 //   loadingPage: false,
-// loadingMovieDetails:false;
-//   watchlist: []
+//   loadingMovieDetails: false,
+//   watchlist: [],
+//   searchParams: {}, //movieKeyword, videoType, yearRange, pageNumber
+//   movieBuffer: [],
+
 // };
 
 import {
   FETCH_MOVIE_LIST_LOADING,
   FETCH_MOVIE_LIST_SUCCESS,
   FETCH_MOVIE_LIST_FAIL,
+  LOAD_BUFFER,
   ADD_TO_WATCHLIST,
   REMOVE_FROM_WATCHLIST,
   FETCH_MOVIE_DETAIL_LOADING,
   FETCH_MOVIE_DETAIL_SUCCESS,
-  FETCH_MOVIE_DETAIL_FAIL
+  FETCH_MOVIE_DETAIL_FAIL,
+  UPDATE_QUERY_DETAILS
 } from '../../constants/actionConstants';
 
 const watchlistAction = (currentWatchlist, movieId, action) => {
@@ -42,6 +47,16 @@ const movieListReducer = (state, { type, payload }) => {
       return { ...state, loadingMovieDetails: false, currentMovie: payload };
     case FETCH_MOVIE_DETAIL_FAIL:
       return { ...state, loadingMovieDetails: false };
+    //buffer
+    case LOAD_BUFFER:
+      return { ...state, movieBuffer: payload };
+
+    //search Params
+    case UPDATE_QUERY_DETAILS: {
+      const newSearchParams = { ...state.searchParams, ...payload };
+      console.log('$$$$$$$$$$$$ new search params -- -->', newSearchParams);
+      return { ...state, searchParams: { ...state.searchParams, ...payload } }; // movieKeyword,videoType,yearRange,pageNumber
+    }
     //movie watchlist
     case ADD_TO_WATCHLIST:
       return {

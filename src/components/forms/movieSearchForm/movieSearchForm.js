@@ -6,6 +6,7 @@ import { Form, Row, Col, Input, Radio, Slider, Button } from 'antd';
 import { colors } from '../../../constants/styleConstants';
 import debounceHandler from '../../../helpers/debounceHandler';
 import loadMovieList from '../../../context/actions/loadMovieList';
+import { UPDATE_QUERY_DETAILS } from '../../../constants/actionConstants';
 
 const AntRow = styled(Row)`
   input {
@@ -82,13 +83,20 @@ const SliderRangeLabel = styled(Col)`
 `;
 const MovieSearchForm = () => {
   const {
-    movieListContext: { movieListDispatch }
+    movieListContext: { movieListDispatch, movieListState }
   } = useContext(GlobalContext);
 
   const [form] = Form.useForm();
-
+  // const {} = movieListState;
   const onFinishFunc = (values) => {
-    loadMovieList(values)(movieListDispatch);
+    const queryParams = { ...values, pageNumber: 1 };
+    console.log('see query params - -- -- >', queryParams);
+    movieListDispatch({ type: UPDATE_QUERY_DETAILS, payload: queryParams });
+    // loadMovieList(movieListDispatch, {
+    //   ...movieListState,
+    //   searchParams: { ...movieListState.searchParams, ...queryParams }
+    // });
+    loadMovieList(movieListDispatch, movieListState, queryParams);
     console.log('Received values of form: ', values);
   };
   const submitForm = () => {
@@ -101,7 +109,7 @@ const MovieSearchForm = () => {
       name="searchMovie_form"
       layout="vertical"
       initialValues={{
-        // yearRange: [], // add initial value to min and max form data I get form the server
+        yearRange: [], // add initial value to min and max form data I get form the server
         movieKeyword: '',
         videoType: 'any'
       }}

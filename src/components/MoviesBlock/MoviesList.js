@@ -18,7 +18,8 @@ const MoviesList = ({ movieList }) => {
   const handleScrollEvent = (e) => {
     let endList = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
     console.log('see this is end list', endList);
-    movieListDispatch({ type: UPDATE_QUERY_DETAILS });
+
+    // movieListDispatch({ type: UPDATE_QUERY_DETAILS });
     // if (endList) {
     //   let newPage = page + 1;
     //   setPage(newPage);
