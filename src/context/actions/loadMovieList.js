@@ -1,6 +1,4 @@
-import { useContext } from 'react';
 import { notification } from 'antd';
-// import { GlobalContext } from '../../context/provider';
 import {
   FETCH_MOVIE_LIST_LOADING,
   FETCH_MOVIE_LIST_SUCCESS,
@@ -21,23 +19,17 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
   const { searchParams, movieList, movieBuffer } = newMovieListState;
   const { movieKeyword, videoType, yearRange, pageNumber } = searchParams;
 
-  console.log('see this is from loadMovieList -- -->', movieListState);
-
   const clearBuffer = () => {
     dispatch({ type: LOAD_BUFFER, payload: [] });
   };
   const initilizeList = (movieListPayload) => {
-    // dispatch({})
     const yearsList = movieListPayload.Search.map((movie) => parseInt(movie.Year.substring(0, 4)));
-    console.log('see this is year list - -- -- -> ', yearsList);
     const min = Math.min(...yearsList);
     const max = Math.max(...yearsList);
-    console.log(`min --> ${min} max --> ${max}`);
     dispatch({ type: UPDATE_QUERY_DETAILS, payload: { yearRange: [min, max] } });
     dispatch({ type: FETCH_MOVIE_LIST_SUCCESS, payload: movieListPayload });
   };
   const is_diff_movie_n_genre = () => {
-    alert('Yes i am called !!!!!!!!!!!!!');
     const {
       searchParams: { movieKeyword, videoType }
     } = movieListState;
@@ -52,13 +44,6 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
       ...currentMovieListObj,
       Search: newMovieListArr
     });
-    // dispatch({
-    //   type: FETCH_MOVIE_LIST_SUCCESS,
-    //   payload: {
-    //     ...currentMovieListObj,
-    //     Search: newMovieListArr
-    //   }
-    // });
   };
 
   dispatch({ type: FETCH_MOVIE_LIST_LOADING });
@@ -66,8 +51,6 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
   if (videoType !== 'any') {
     apiString += `&type=${videoType}`;
   }
-
-  console.log('see this is api string - ---- -- > ', apiString);
   const fetchedMovies = await axiosInstance.get(apiString).catch((err) => {
     dispatch({ type: FETCH_MOVIE_LIST_FAIL });
     http_reqHandler(err);
@@ -106,16 +89,6 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
       const remainingSlot = 10 - (movieList.Search.length % 10);
       if (updatedMovieBuffer.length < remainingSlot) {
         const newPageNumber = pageNumber + 1;
-        // dispatch({ type: LOAD_BUFFER, payload: updatedMovieBuffer });
-        // console.log('(((((((((((((((((((((((((((((0)))))))))))))))))))))))))))))))))))))');
-        // console.log('^^^^^^^^^^^^^^^^^^^^^^^^ movieList status sent for second page', {
-        //   ...movieListState,
-        //   movieBuffer: updatedMovieBuffer
-        // });
-        // console.log('^^^^^^^^^^^^^^^^^^^^^^^^new query sent for second page', {
-        //   ...newQuery,
-        //   pageNumber: newPageNumber
-        // });
         loadMovieList(
           dispatch,
           { ...movieListState, movieBuffer: updatedMovieBuffer },

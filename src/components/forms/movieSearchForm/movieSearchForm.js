@@ -95,14 +95,11 @@ const MovieSearchForm = () => {
     } else if (isEmpty(movieListState.searchParams.yearRange)) {
       result = true;
     }
-    console.log('see range disable status %%%%%%%%%%%%%%%% ', result);
     return result;
   };
   const onFinishFunc = (values) => {
     const pageNumber = searchParams.pageNumber || 1;
     const queryParams = { ...values, pageNumber };
-    console.log('see query params - -- -- >', queryParams);
-
     movieListDispatch({ type: UPDATE_QUERY_DETAILS, payload: queryParams });
     loadMovieList(movieListDispatch, movieListState, {
       ...searchParams,
@@ -110,7 +107,6 @@ const MovieSearchForm = () => {
     });
   };
   const submitForm = () => {
-    console.log('yes triggered submit');
     form.submit();
   };
   return (
@@ -123,21 +119,16 @@ const MovieSearchForm = () => {
         movieKeyword: '',
         videoType: 'any'
       }}
-      onFinish={onFinishFunc}
-      // submit={submitForm}
-      // onChange={onChangeForm}
-    >
+      onFinish={onFinishFunc}>
       <AntRow color={colors.white}>
         <Col xs={{ span: 24 }} lg={{ span: 9 }}>
           <Form.Item style={{ marginBottom: 0 }} name="movieKeyword">
             <Input
-              // style={{ fontSize: '3rem' }}
               bordered={false}
               size="large"
               placeholder="Search"
               prefix={
                 <SearchOutlined
-                  // htmltype="submit"
                   onClick={submitForm}
                   style={{ fontSize: '1.2rem', paddingRight: '0.5rem', color: colors.white }}
                 />

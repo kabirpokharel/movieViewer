@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { GlobalContext } from '../../context/provider';
-import { Button, Col, Row, Tag } from 'antd';
+import { Button, Col, Row, Spin, Tag } from 'antd';
 // import { movieData } from '../../constants/dummyMovieSearchResult';
 import { LikeFilled, LikeOutlined } from '@ant-design/icons/lib/icons';
 import { colors } from '../../constants/styleConstants';
@@ -120,8 +120,21 @@ const SelectedMovie = () => {
 
   const { currentMovie, watchlist, loadingMovieDetails } = movieListState;
 
-  if (loadingMovieDetails) {
-    return <div>Movie Loading</div>;
+  if (!loadingMovieDetails) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%'
+        }}>
+        <div>
+          <Spin size="middle" />
+          apple
+        </div>
+      </div>
+    );
   }
   if (isEmpty(currentMovie)) {
     return (

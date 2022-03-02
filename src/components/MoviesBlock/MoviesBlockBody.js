@@ -13,7 +13,6 @@ const MoviesBlockBody = () => {
   } = useContext(GlobalContext);
 
   const { movieList, loadingPage } = movieListState;
-  console.log('see this is movieListState', movieListState);
 
   if (isEmpty(movieList)) {
     return (
@@ -44,7 +43,7 @@ const MoviesBlockBody = () => {
 
           // background: 'yellow'
         }}>
-        <Spin style={{ color: 'grey' }} size="large" />
+        <Spin size="large" />
       </div>
     );
   }

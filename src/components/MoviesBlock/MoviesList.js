@@ -20,7 +20,6 @@ const MoviesList = ({ movieList }) => {
     let endList = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
     if (endList) {
       const newPageNumber = movieListState.searchParams.pageNumber + 1;
-      console.log('newPagenumber MovieList -- ->', newPageNumber);
       movieListDispatch({
         type: UPDATE_QUERY_DETAILS,
         payload: { ...movieListState.searchParams, pageNumber: newPageNumber }
@@ -30,12 +29,9 @@ const MoviesList = ({ movieList }) => {
         pageNumber: newPageNumber
       });
     }
-    console.log('see this is end list', endList);
   };
 
   const MovieListDisplay = () => {
-    console.log('see this is movieList on movieList page -- --- ->', movieList);
-
     if (isEmpty(movies) && movieList.Error) {
       return <div>{movieList.Error}</div>;
     }
