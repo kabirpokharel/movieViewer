@@ -5,7 +5,8 @@ import {
   FETCH_MOVIE_LIST_LOADING,
   FETCH_MOVIE_LIST_SUCCESS,
   FETCH_MOVIE_LIST_FAIL,
-  LOAD_BUFFER
+  LOAD_BUFFER,
+  UPDATE_QUERY_DETAILS
 } from '../../constants/actionConstants';
 import { apikey } from '../../constants/baseURL';
 import axiosInstance from '../../helpers/axiosInstance';
@@ -13,13 +14,6 @@ import http_reqHandler from '../../helpers/http_reqHandler';
 import isEmpty from '../../helpers/isEmpty';
 
 const loadMovieList = async (dispatch, movieListState, newQuery) => {
-  // const {
-  //   movieListContext: { movieListDispatch, movieListState }
-  // } = useContext(GlobalContext);
-
-  // if (movieListState.searchParams.type !== newQuery.type) {
-  //   return;
-  // }
   let newMovieListState = {
     ...movieListState,
     searchParams: { ...movieListState.searchParams, ...newQuery }
@@ -32,20 +26,45 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
   const clearBuffer = () => {
     dispatch({ type: LOAD_BUFFER, payload: [] });
   };
+  const initilizeList = (movieListPayload) => {
+    // dispatch({})
+    const yearsList = movieListPayload.Search.map((movie) => parseInt(movie.Year.substring(0, 4)));
+    console.log('see this is year list - -- -- -> ', yearsList);
+    const min = Math.min(...yearsList);
+    const max = Math.max(...yearsList);
+    console.log(`min --> ${min} max --> ${max}`);
+    dispatch({ type: UPDATE_QUERY_DETAILS, payload: { yearRange: [min, max] } });
+    dispatch({ type: FETCH_MOVIE_LIST_SUCCESS, payload: movieListPayload });
+  };
+  const is_diff_movie_n_genre = () => {
+    alert('Yes i am called !!!!!!!!!!!!!');
+    const {
+      searchParams: { movieKeyword, videoType }
+    } = movieListState;
+    if (movieKeyword !== newQuery.movieKeyword || videoType !== newQuery.videoType) {
+      return true;
+    }
+    return false;
+  };
+
   const appendMovieList = (currentMovieListObj, newMovieListArr) => {
-    dispatch({
-      type: FETCH_MOVIE_LIST_SUCCESS,
-      payload: {
-        ...currentMovieListObj,
-        Search: [...currentMovieListObj.Search, ...newMovieListArr]
-      }
+    initilizeList({
+      ...currentMovieListObj,
+      Search: newMovieListArr
     });
+    // dispatch({
+    //   type: FETCH_MOVIE_LIST_SUCCESS,
+    //   payload: {
+    //     ...currentMovieListObj,
+    //     Search: newMovieListArr
+    //   }
+    // });
   };
 
   dispatch({ type: FETCH_MOVIE_LIST_LOADING });
   let apiString = `/?apikey=${apikey}&s=${movieKeyword}&plot=full&page=${pageNumber}`;
   if (videoType !== 'any') {
-    apiString += `&type=${'movies'}`;
+    apiString += `&type=${videoType}`;
   }
 
   console.log('see this is api string - ---- -- > ', apiString);
@@ -62,32 +81,50 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
       placement: 'bottomRight',
       duration: 2
     });
-    if (isEmpty(movieList)) {
-      dispatch({
-        type: FETCH_MOVIE_LIST_SUCCESS,
-        payload: { ...fetchedMovies.data, Search: [], totalResults: '0' }
-      });
-    } else {
-      dispatch({ type: FETCH_MOVIE_LIST_FAIL });
-    }
-  }
-  if (fetchedMovies.data.Response === 'True') {
+    dispatch({ type: FETCH_MOVIE_LIST_FAIL });
+  } else if (fetchedMovies.data.Response === 'True') {
     let movieListResult = fetchedMovies.data.Search;
     let updatedMovieBuffer = [...movieBuffer, ...movieListResult];
     let updatedMovieList = [];
-    if (isEmpty(movieList)) {
-      dispatch({ type: FETCH_MOVIE_LIST_SUCCESS, payload: movieListPayload });
+    if (is_diff_movie_n_genre()) {
+      initilizeList(movieListPayload);
+      dispatch({
+        type: UPDATE_QUERY_DETAILS,
+        payload: {
+          ...movieListState.searchParams,
+          ...movieListState.searchParams,
+          pageNumber: 1,
+          movieKeyword,
+          videoType
+        }
+      });
+      clearBuffer();
+    } else if (isEmpty(movieList)) {
+      initilizeList(movieListPayload);
       clearBuffer();
     } else {
-      if (isEmpty(movieList.Search) || movieList.Search.length % 10 !== 0) {
-        const remainingSlot = 10 - (movieList.Search.length % 10);
-        updatedMovieList = [...movieList.Search, ...updatedMovieBuffer.splice(0, remainingSlot)];
-        dispatch({ type: LOAD_BUFFER, payload: updatedMovieBuffer });
-        appendMovieList(movieList, updatedMovieList);
-      } else {
-        clearBuffer();
-        appendMovieList(movieList, updatedMovieBuffer);
+      const remainingSlot = 10 - (movieList.Search.length % 10);
+      if (updatedMovieBuffer.length < remainingSlot) {
+        const newPageNumber = pageNumber + 1;
+        // dispatch({ type: LOAD_BUFFER, payload: updatedMovieBuffer });
+        // console.log('(((((((((((((((((((((((((((((0)))))))))))))))))))))))))))))))))))))');
+        // console.log('^^^^^^^^^^^^^^^^^^^^^^^^ movieList status sent for second page', {
+        //   ...movieListState,
+        //   movieBuffer: updatedMovieBuffer
+        // });
+        // console.log('^^^^^^^^^^^^^^^^^^^^^^^^new query sent for second page', {
+        //   ...newQuery,
+        //   pageNumber: newPageNumber
+        // });
+        loadMovieList(
+          dispatch,
+          { ...movieListState, movieBuffer: updatedMovieBuffer },
+          { ...newQuery, pageNumber: newPageNumber }
+        );
       }
+      updatedMovieList = [...movieList.Search, ...updatedMovieBuffer.splice(0, remainingSlot)];
+      dispatch({ type: LOAD_BUFFER, payload: updatedMovieBuffer });
+      appendMovieList(movieList, updatedMovieList);
     }
   }
 };

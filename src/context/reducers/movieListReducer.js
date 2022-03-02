@@ -53,8 +53,6 @@ const movieListReducer = (state, { type, payload }) => {
 
     //search Params
     case UPDATE_QUERY_DETAILS: {
-      const newSearchParams = { ...state.searchParams, ...payload };
-      console.log('$$$$$$$$$$$$ new search params -- -->', newSearchParams);
       return { ...state, searchParams: { ...state.searchParams, ...payload } }; // movieKeyword,videoType,yearRange,pageNumber
     }
     //movie watchlist

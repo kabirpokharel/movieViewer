@@ -8,23 +8,29 @@ import { BodyText } from '../Fonts/font';
 import { SET_CURRENT_MOVIE, UPDATE_QUERY_DETAILS } from '../../constants/actionConstants';
 import loadMovieDetails from '../../context/actions/loadSelectedMovie';
 import isEmpty from '../../helpers/isEmpty';
+import loadMovieList from '../../context/actions/loadMovieList';
 
 const MoviesList = ({ movieList }) => {
   const {
-    movieListContext: { movieListDispatch }
+    movieListContext: { movieListDispatch, movieListState }
   } = useContext(GlobalContext);
   const { Search: movies, totalResults } = movieList;
 
   const handleScrollEvent = (e) => {
     let endList = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
+    if (endList) {
+      const newPageNumber = movieListState.searchParams.pageNumber + 1;
+      console.log('newPagenumber MovieList -- ->', newPageNumber);
+      movieListDispatch({
+        type: UPDATE_QUERY_DETAILS,
+        payload: { ...movieListState.searchParams, pageNumber: newPageNumber }
+      });
+      loadMovieList(movieListDispatch, movieListState, {
+        ...movieListState.searchParams,
+        pageNumber: newPageNumber
+      });
+    }
     console.log('see this is end list', endList);
-
-    // movieListDispatch({ type: UPDATE_QUERY_DETAILS });
-    // if (endList) {
-    //   let newPage = page + 1;
-    //   setPage(newPage);
-    //   getMovies(newPage);
-    // }
   };
 
   const MovieListDisplay = () => {
@@ -44,8 +50,9 @@ const MoviesList = ({ movieList }) => {
 
   return (
     <>
-      <div style={{ padding: '2rem 2rem 1rem' }}>
+      <div style={{ padding: '2rem 2rem 1rem', display: 'flex', justifyContent: 'space-between' }}>
         <BodyText sm={true}>{totalResults} RESULTS</BodyText>
+        <BodyText sm={true}>{movies.length} SEEN</BodyText>
       </div>
       <div
         onScroll={handleScrollEvent}

@@ -7,6 +7,7 @@ import { colors } from '../../../constants/styleConstants';
 import debounceHandler from '../../../helpers/debounceHandler';
 import loadMovieList from '../../../context/actions/loadMovieList';
 import { UPDATE_QUERY_DETAILS } from '../../../constants/actionConstants';
+import isEmpty from '../../../helpers/isEmpty';
 
 const AntRow = styled(Row)`
   input {
@@ -82,22 +83,31 @@ const SliderRangeLabel = styled(Col)`
   color: ${() => colors.GREY_COLOR_2};
 `;
 const MovieSearchForm = () => {
+  const [form] = Form.useForm();
   const {
     movieListContext: { movieListDispatch, movieListState }
   } = useContext(GlobalContext);
-
-  const [form] = Form.useForm();
-  // const {} = movieListState;
+  const { searchParams } = movieListState;
+  const disableYearRange = () => {
+    let result = false;
+    if (isEmpty(movieListState.searchParams)) {
+      result = true;
+    } else if (isEmpty(movieListState.searchParams.yearRange)) {
+      result = true;
+    }
+    console.log('see range disable status %%%%%%%%%%%%%%%% ', result);
+    return result;
+  };
   const onFinishFunc = (values) => {
-    const queryParams = { ...values, pageNumber: 1 };
+    const pageNumber = searchParams.pageNumber || 1;
+    const queryParams = { ...values, pageNumber };
     console.log('see query params - -- -- >', queryParams);
+
     movieListDispatch({ type: UPDATE_QUERY_DETAILS, payload: queryParams });
-    // loadMovieList(movieListDispatch, {
-    //   ...movieListState,
-    //   searchParams: { ...movieListState.searchParams, ...queryParams }
-    // });
-    loadMovieList(movieListDispatch, movieListState, queryParams);
-    console.log('Received values of form: ', values);
+    loadMovieList(movieListDispatch, movieListState, {
+      ...searchParams,
+      ...queryParams
+    });
   };
   const submitForm = () => {
     console.log('yes triggered submit');
@@ -139,21 +149,28 @@ const MovieSearchForm = () => {
           <AntRow justify="end" color={colors.white}>
             <Col xs={{ span: 12 }} lg={{ span: 7 }}>
               <AntRow>
-                <SliderRangeLabel span={3}>1970</SliderRangeLabel>
+                {!disableYearRange() && (
+                  <SliderRangeLabel span={3}>{searchParams.yearRange[0]}</SliderRangeLabel>
+                )}
                 <Col span={18}>
                   <Form.Item label="YEAR" style={{ marginBottom: 0 }} name="yearRange">
                     <Slider
-                      onChange={() => submitForm('delay')}
-                      // onKeyPress={(e) => radioValueChange(e)}
-                      disabled={true}
-                      range
-                      min={0}
-                      max={0}
-                      // defaultValue={[1999, 2009]}
+                      // onChange={submitForm}
+                      disabled={disableYearRange()}
+                      range={true}
+                      min={(!disableYearRange() && searchParams.yearRange[0]) || 0}
+                      max={(!disableYearRange() && searchParams.yearRange[1]) || 0}
+                      defaultValue={
+                        !disableYearRange()
+                          ? [searchParams.yearRange[0], searchParams.yearRange[1]]
+                          : [0, 0]
+                      }
                     />
                   </Form.Item>
                 </Col>
-                <SliderRangeLabel span={3}>2015</SliderRangeLabel>
+                {!disableYearRange() && (
+                  <SliderRangeLabel span={3}>{searchParams.yearRange[1]}</SliderRangeLabel>
+                )}
               </AntRow>
             </Col>
             <Col xs={{ span: 12 }} lg={{ span: 12 }}>
