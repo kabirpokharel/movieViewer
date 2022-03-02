@@ -13,6 +13,13 @@ import isEmpty from '../../helpers/isEmpty';
 const MoviesBlockBodyWrapper = styled.div`
   padding: 2rem 0 0 2rem;
 `;
+const NoContentWrapper = styled.div`
+  display: flex;
+  background: 'pink';
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
 const MovieDetailWrapper = styled.div`
   &::after {
     content: '·';
@@ -120,27 +127,18 @@ const SelectedMovie = () => {
 
   const { currentMovie, watchlist, loadingMovieDetails } = movieListState;
 
-  if (!loadingMovieDetails) {
+  if (loadingMovieDetails) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%'
-        }}>
-        <div>
-          <Spin size="middle" />
-          apple
-        </div>
-      </div>
+      <NoContentWrapper>
+        <Spin size="middle" />
+      </NoContentWrapper>
     );
   }
   if (isEmpty(currentMovie)) {
     return (
-      <div>
+      <NoContentWrapper>
         <h1>No movie selected</h1>
-      </div>
+      </NoContentWrapper>
     );
   }
   return (

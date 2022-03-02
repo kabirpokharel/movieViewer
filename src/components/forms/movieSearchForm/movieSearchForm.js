@@ -115,7 +115,9 @@ const MovieSearchForm = () => {
       name="searchMovie_form"
       layout="vertical"
       initialValues={{
-        yearRange: [], // add initial value to min and max form data I get form the server
+        yearRange: !disableYearRange()
+          ? [searchParams.yearRange[0], searchParams.yearRange[1]]
+          : [0, 0],
         movieKeyword: '',
         videoType: 'any'
       }}
@@ -151,11 +153,6 @@ const MovieSearchForm = () => {
                       range={true}
                       min={(!disableYearRange() && searchParams.yearRange[0]) || 0}
                       max={(!disableYearRange() && searchParams.yearRange[1]) || 0}
-                      defaultValue={
-                        !disableYearRange()
-                          ? [searchParams.yearRange[0], searchParams.yearRange[1]]
-                          : [0, 0]
-                      }
                     />
                   </Form.Item>
                 </Col>
