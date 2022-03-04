@@ -8,86 +8,16 @@ import debounceHandler from '../../../helpers/debounceHandler';
 import loadMovieList from '../../../context/actions/loadMovieList';
 import { UPDATE_QUERY_DETAILS } from '../../../constants/actionConstants';
 import isEmpty from '../../../helpers/isEmpty';
+import { AntRow, SliderRangeLabel } from './styledMovieSearchForm';
+import getMovieYearRange from '../../../helpers/getMovieYearRange';
 
-const AntRow = styled(Row)`
-  input {
-    color: ${({ color }) => color};
-  }
-  .ant-radio-wrapper {
-    font-size: 0.77rem;
-  }
-  .ant-input-lg {
-    font-size: 1.1rem;
-  }
-  .ant-form-item-label {
-    padding-bottom: 0;
-  }
-  .ant-form-item-label {
-    & > label {
-      color: ${({ color }) => color};
-      font-size: 0.8rem;
-    }
-  }
-
-  .ant-form-item-control-input {
-    min-height: min-content;
-  }
-
-  .ant-radio-checked .ant-radio-inner {
-    border-color: #fff !important ;
-  }
-  .ant-radio-wrapper {
-    color: ${({ color }) => color};
-  }
-  .ant-radio-inner {
-    background-color: ${() => colors.GREY_COLOR_1};
-  }
-  .ant-radio-checked .ant-radio-inner:after {
-    background-color: ${() => colors.white};
-  }
-
-  .ant-radio:hover .ant-radio-inner {
-    border-color: #fff;
-  }
-  .ant-radio-checked .ant-radio-inner:focus {
-    border-color: green;
-  }
-  .ant-slider {
-    padding: 0;
-    height: 0;
-    &:hover {
-      background-color: ${() => colors.GREY_COLOR_2};
-    }
-  }
-  .ant-slider-track {
-    background-color: ${() => colors.GREY_COLOR_2};
-    &:hover {
-      background-color: ${() => colors.GREY_COLOR_2};
-    }
-  }
-  .ant-slider-handle {
-    background-color: ${() => colors.GREY_COLOR_2};
-    border: ${() => `2px solid ${colors.GREY_COLOR_2}`};
-    &:focus {
-      box-shadow: none;
-      border-color: none;
-    }
-  }
-`;
-
-const SliderRangeLabel = styled(Col)`
-  display: flex;
-  font-size: 0.77rem;
-  align-items: center;
-  justify-content: center;
-  color: ${() => colors.GREY_COLOR_2};
-`;
 const MovieSearchForm = () => {
   const [form] = Form.useForm();
   const {
     movieListContext: { movieListDispatch, movieListState }
   } = useContext(GlobalContext);
-  const { searchParams } = movieListState;
+  const { searchParams, movieList } = movieListState;
+  console.log('this is movileListState  - --> ', movieListState);
   const disableYearRange = () => {
     let result = false;
     if (isEmpty(movieListState.searchParams)) {
@@ -97,7 +27,17 @@ const MovieSearchForm = () => {
     }
     return result;
   };
+  const getYearRange = (valueType) => {
+    if (isEmpty(movieList)) {
+      return 0;
+    }
+    const { min, max } = getMovieYearRange(movieList.Search);
+    if (valueType === 'min') {
+      return min;
+    } else return max;
+  };
   const onFinishFunc = (values) => {
+    console.log('this is form values', values);
     const pageNumber = searchParams.pageNumber || 1;
     const queryParams = { ...values, pageNumber };
     movieListDispatch({ type: UPDATE_QUERY_DETAILS, payload: queryParams });
@@ -115,9 +55,10 @@ const MovieSearchForm = () => {
       name="searchMovie_form"
       layout="vertical"
       initialValues={{
-        yearRange: !disableYearRange()
-          ? [searchParams.yearRange[0], searchParams.yearRange[1]]
-          : [0, 0],
+        // yearRange: !disableYearRange()
+        //   ? [searchParams.yearRange[0], searchParams.yearRange[1]]
+        //   : [0, 0],
+        yearRange: [0, 0],
         movieKeyword: '',
         videoType: 'any'
       }}
@@ -148,11 +89,12 @@ const MovieSearchForm = () => {
                 <Col span={18}>
                   <Form.Item label="YEAR" style={{ marginBottom: 0 }} name="yearRange">
                     <Slider
-                      // onChange={submitForm}
+                      onChange={submitForm}
                       disabled={disableYearRange()}
                       range={true}
-                      min={(!disableYearRange() && searchParams.yearRange[0]) || 0}
-                      max={(!disableYearRange() && searchParams.yearRange[1]) || 0}
+                      defaultValue={[0, 0]}
+                      min={getYearRange('min')}
+                      max={getYearRange('max')}
                     />
                   </Form.Item>
                 </Col>

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-// import PropTypes from 'prop-types';
 import { GlobalContext } from '../../context/provider';
-import { Col, Row, Spin } from 'antd';
+import { Col, Row, Spin, Typography } from 'antd';
 import MoviesList from './MoviesList';
-// import { movieSearchResult } from '../../constants/dummyMovieSearchResult';
 import SelectedMovie from './SelectedMovie';
 import isEmpty from '../../helpers/isEmpty';
+import { BodyElemCentered } from './styledMovieBlock';
 
+const { Title } = Typography;
 const MoviesBlockBody = () => {
   const {
     movieListContext: { movieListState }
@@ -16,35 +16,18 @@ const MoviesBlockBody = () => {
 
   if (isEmpty(movieList)) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 'calc(100vh - 93px - 3rem)'
-        }}>
-        <div>No movies to show</div>
-      </div>
+      <BodyElemCentered>
+        <Title disabled level={4}>
+          No movies to show
+        </Title>
+      </BodyElemCentered>
     );
   }
   if (loadingPage) {
     return (
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 3,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-
-          // background: 'yellow'
-        }}>
+      <BodyElemCentered>
         <Spin size="large" />
-      </div>
+      </BodyElemCentered>
     );
   }
   return (

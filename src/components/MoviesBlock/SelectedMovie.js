@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { GlobalContext } from '../../context/provider';
-import { Button, Col, Row, Spin, Tag } from 'antd';
+import { Button, Col, Row, Spin, Tag, Typography } from 'antd';
 // import { movieData } from '../../constants/dummyMovieSearchResult';
 import { LikeFilled, LikeOutlined } from '@ant-design/icons/lib/icons';
 import { colors } from '../../constants/styleConstants';
@@ -47,6 +47,7 @@ const RatingContainer = styled.div`
   }
 `;
 
+const { Title } = Typography;
 const watchListToggler = (movieId, dispatch, watchlist) => {
   const isInWatchlist = watchlist.find((movie) => movie.imdbID === movieId);
   let action = ADD_TO_WATCHLIST;
@@ -137,7 +138,9 @@ const SelectedMovie = () => {
   if (isEmpty(currentMovie)) {
     return (
       <NoContentWrapper>
-        <h1>No movie selected</h1>
+        <Title disabled level={3}>
+          Select a movie
+        </Title>
       </NoContentWrapper>
     );
   }

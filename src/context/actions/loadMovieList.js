@@ -8,6 +8,7 @@ import {
 } from '../../constants/actionConstants';
 import { apikey } from '../../constants/baseURL';
 import axiosInstance from '../../helpers/axiosInstance';
+import getMovieYearRange from '../../helpers/getMovieYearRange';
 import http_reqHandler from '../../helpers/http_reqHandler';
 import isEmpty from '../../helpers/isEmpty';
 
@@ -23,17 +24,33 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
     dispatch({ type: LOAD_BUFFER, payload: [] });
   };
   const initilizeList = (movieListPayload) => {
-    const yearsList = movieListPayload.Search.map((movie) => parseInt(movie.Year.substring(0, 4)));
-    const min = Math.min(...yearsList);
-    const max = Math.max(...yearsList);
+    const { min, max } = getMovieYearRange(movieListPayload.Search);
     dispatch({ type: UPDATE_QUERY_DETAILS, payload: { yearRange: [min, max] } });
+    // console.log('movie list --- -- >', movieListPayload);
     dispatch({ type: FETCH_MOVIE_LIST_SUCCESS, payload: movieListPayload });
   };
-  const is_diff_movie_n_genre = () => {
+  const yearRangeDirty = (currentYearRange) => {
+    if (JSON.stringify(currentYearRange) === '[0, 0]') {
+      return false;
+    } else return true;
+  };
+  const yearRangeChanged = (oldRange, newRange) => {
+    if (!yearRangeDirty(newRange)) {
+      return false;
+    } else if (JSON.stringify(oldRange) === JSON.stringify(newRange)) {
+      return false;
+    } else return true;
+  };
+
+  const is_diff_movie_genre_year = () => {
     const {
       searchParams: { movieKeyword, videoType }
     } = movieListState;
-    if (movieKeyword !== newQuery.movieKeyword || videoType !== newQuery.videoType) {
+    if (
+      movieKeyword !== newQuery.movieKeyword ||
+      videoType !== newQuery.videoType ||
+      yearRangeChanged(movieListState.searchParams.yearRange, newQuery.yearRange)
+    ) {
       return true;
     }
     return false;
@@ -69,13 +86,15 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
     let movieListResult = fetchedMovies.data.Search;
     let updatedMovieBuffer = [...movieBuffer, ...movieListResult];
     let updatedMovieList = [];
-    if (is_diff_movie_n_genre()) {
+    console.log("Inside fetchedMovies.data.Response === 'True'");
+    if (is_diff_movie_genre_year()) {
+      console.log('is_diff_movie_genre_year triggered!!!!');
       initilizeList(movieListPayload);
       dispatch({
         type: UPDATE_QUERY_DETAILS,
         payload: {
           ...movieListState.searchParams,
-          ...movieListState.searchParams,
+          // yearRange: [],
           pageNumber: 1,
           movieKeyword,
           videoType
@@ -83,9 +102,11 @@ const loadMovieList = async (dispatch, movieListState, newQuery) => {
       });
       clearBuffer();
     } else if (isEmpty(movieList)) {
+      console.log('for empty movieList state');
       initilizeList(movieListPayload);
       clearBuffer();
     } else {
+      console.log('else block besides everything');
       const remainingSlot = 10 - (movieList.Search.length % 10);
       if (updatedMovieBuffer.length < remainingSlot) {
         const newPageNumber = pageNumber + 1;
